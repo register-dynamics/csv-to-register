@@ -4,7 +4,6 @@ from datetime import datetime
 from hashlib import sha256
 
 import click
-from slugify import slugify
 from tqdm import tqdm # progress bar
 
 @click.command()
@@ -18,7 +17,7 @@ def csv_to_rsf(csv_file, key_field, region):
   timestamp = get_timestamp()
   reader = csv.DictReader(csv_file)
   for row in tqdm(reader):
-    key = sanitise_key(row.get(key_field)) # TODO: Output rows missing keys to stderr
+    key = row.get(key_field) # TODO: Output rows missing keys to stderr
     row_json = json.dumps(row)
     row_hash = hash(row_json)
     print('add-item\t{}'.format(row_json))
@@ -27,9 +26,6 @@ def csv_to_rsf(csv_file, key_field, region):
 
 def get_root_hash():
   return hash('')
-
-def sanitise_key(raw_key):
-  return slugify(raw_key, separator='_', lowercase=False)
 
 def get_timestamp():
   return datetime.utcnow().isoformat(timespec='seconds') + 'Z'
